@@ -18,8 +18,10 @@ class ServoCalibrationTool
 
     private:
         ros::NodeHandle node;
-        ros::Publisher publisherCalibrationLimitValue;
-        ros::Publisher publisherCalibrationPointValue;
+        ros::Publisher publisherCalibrationLowerLimitValue;
+        ros::Publisher publisherCalibrationUpperLimitValue;
+        ros::Publisher publisherCalibrationFirstPointValue;
+        ros::Publisher publisherCalibrationSecondPointValue;
         ros::Publisher publisherServoState;
         ros::Publisher publisherSignalingChannel;
 
