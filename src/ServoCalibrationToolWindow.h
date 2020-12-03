@@ -16,6 +16,15 @@ public:
 
 signals:
     void onSignalStrength(size_t channelIndex, double signalStrength);
+    void onFirstPoint(size_t servoIndex, double signalStrength, double servoAngle);
+    void onSecondPoint(size_t servoIndex, double signalStrength, double servoAngle);
+    void onLowerLimit(size_t servoIndex, double signalStrength);
+    void onUpperLimit(size_t servoIndex, double signalStrength);
+
+private:
+    void connectChannelGroup();
+    void connectCalibrationGroup();
+    void connectServoGroup();
 
 private:
     Ui::ServoCalibrationToolWindow *ui;

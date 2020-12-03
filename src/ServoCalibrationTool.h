@@ -17,6 +17,9 @@ class ServoCalibrationTool
         ServoCalibrationTool();
 
     private:
+        void connectWindow();
+
+    private:
         ros::NodeHandle node;
         ros::Publisher publisherCalibrationLowerLimitValue;
         ros::Publisher publisherCalibrationUpperLimitValue;
