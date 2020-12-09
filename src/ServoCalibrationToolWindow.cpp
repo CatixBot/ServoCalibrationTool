@@ -1,6 +1,11 @@
 #include "ServoCalibrationToolWindow.h"
 #include "ui_servocalibrationtoolwindow.h"
 
+double convertDegreesToRadians(double angleInDegrees)
+{
+    return angleInDegrees * M_PI / 180.0;
+}
+
 ServoCalibrationToolWindow::ServoCalibrationToolWindow(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::ServoCalibrationToolWindow)
@@ -19,6 +24,14 @@ ServoCalibrationToolWindow::~ServoCalibrationToolWindow()
 
 void ServoCalibrationToolWindow::connectChannelGroup()
 {
+    QObject::connect(ui->pushButtonDropAll, &QPushButton::pressed, [&]()
+    {
+        ui->signalingChannelCheckBox->setChecked(false);
+        ui->signalStrengthDial->setValue(0);
+
+        emit onDropAll();
+    });
+
     QObject::connect(ui->signalStrengthDial, &QDial::valueChanged, [&](int dialValue)
     {
         if (!ui->signalingChannelCheckBox->isChecked())
@@ -117,4 +130,38 @@ void ServoCalibrationToolWindow::connectCalibrationGroup()
 
 void ServoCalibrationToolWindow::connectServoGroup()
 {
+    QObject::connect(ui->pushButtonDropAll, &QPushButton::pressed, [&]()
+    {
+        ui->servoAngeCheckBox->setChecked(false);
+        ui->servoAngleDial->setValue(0);
+    });
+
+    QObject::connect(ui->servoAngleDial, &QDial::valueChanged, [&](int dialValue)
+    {
+        if (!ui->servoAngeCheckBox->isChecked())
+        {
+            return;
+        }
+
+        const size_t servoIndex = ui->servoIndexComboBox->currentIndex();
+        const double servoAngle = convertDegreesToRadians(dialValue);
+        emit onServoAngle(servoIndex, servoAngle);
+    });
+
+    QObject::connect(ui->servoAngleDial, &QDial::valueChanged, [&](int dialValue)
+    {
+        this->ui->showServoAngleSpinBox->setValue(dialValue);
+    });
+
+    QObject::connect(ui->signalingChannelCheckBox, &QCheckBox::toggled, [&](bool isChecked)
+    {
+        if (!isChecked)
+        {
+            return;
+        }
+
+        const size_t servoIndex = ui->servoIndexComboBox->currentIndex();
+        const double servoAngle = convertDegreesToRadians(ui->signalStrengthDial->value());
+        emit onServoAngle(servoIndex, servoAngle);
+    });
 }

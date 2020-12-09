@@ -21,6 +21,7 @@ class ServoCalibrationTool
 
     private:
         ros::NodeHandle node;
+        ros::Publisher publisherSignalingDrop;
         ros::Publisher publisherCalibrationLowerLimitValue;
         ros::Publisher publisherCalibrationUpperLimitValue;
         ros::Publisher publisherCalibrationFirstPointValue;

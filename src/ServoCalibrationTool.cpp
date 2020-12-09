@@ -1,5 +1,6 @@
 #include "ServoCalibrationTool.h"
 
+#include <std_msgs/Empty.h>
 #include <catix_messages/CalibrationLimitValue.h>
 #include <catix_messages/CalibrationPointValue.h>
 #include <catix_messages/SignalingChannelState.h>
@@ -9,6 +10,9 @@
 
 ServoCalibrationTool::ServoCalibrationTool()
 {
+    ROS_INFO("Create calibration table publishers");
+    this->publisherSignalingDrop = node.advertise<std_msgs::Empty>("Catix/SignalingDrop", 1);
+
     ROS_INFO("Create calibration table publishers");
     this->publisherCalibrationFirstPointValue = node.advertise<catix_messages::CalibrationPointValue>("Catix/CalibrationFirstPoint", 1);
     this->publisherCalibrationSecondPointValue = node.advertise<catix_messages::CalibrationPointValue>("Catix/CalibrationSecondPoint", 1);
@@ -27,6 +31,13 @@ ServoCalibrationTool::ServoCalibrationTool()
 
 void ServoCalibrationTool::connectWindow()
 {
+    QObject::connect(&this->window, &ServoCalibrationToolWindow::onDropAll, [this]()
+    {
+        std_msgs::Empty dropAllEventMessage;
+        this->publisherSignalingDrop.publish(dropAllEventMessage);
+        ROS_INFO("Drop signaling");
+    });
+
     QObject::connect(&this->window, &ServoCalibrationToolWindow::onSignalStrength, [this](size_t signalIndex, double signalStrength)
     {
         catix_messages::SignalingChannelState channelStateMessage;
@@ -77,5 +88,15 @@ void ServoCalibrationTool::connectWindow()
 
         this->publisherCalibrationUpperLimitValue.publish(limitValueMessage);
         ROS_INFO("Upper limit %d: [%f%%]", servoIndex, signalStrength);
+    });
+
+    QObject::connect(&this->window, &ServoCalibrationToolWindow::onServoAngle, [this](size_t servoIndex, double servoAngle)
+    {
+        catix_messages::ServoState servoStateMessage;
+        servoStateMessage.servo_index = static_cast<uint8_t>(servoIndex);
+        servoStateMessage.rotate_angle = servoAngle;
+
+        this->publisherServoState.publish(servoStateMessage);
+        ROS_INFO("Servo %d: [%frad]", servoIndex, servoAngle);
     });
 }
