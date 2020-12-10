@@ -153,7 +153,7 @@ void ServoCalibrationToolWindow::connectServoGroup()
         this->ui->showServoAngleSpinBox->setValue(dialValue);
     });
 
-    QObject::connect(ui->signalingChannelCheckBox, &QCheckBox::toggled, [&](bool isChecked)
+    QObject::connect(ui->servoAngeCheckBox, &QCheckBox::toggled, [&](bool isChecked)
     {
         if (!isChecked)
         {
@@ -161,7 +161,7 @@ void ServoCalibrationToolWindow::connectServoGroup()
         }
 
         const size_t servoIndex = ui->servoIndexComboBox->currentIndex();
-        const double servoAngle = convertDegreesToRadians(ui->signalStrengthDial->value());
+        const double servoAngle = convertDegreesToRadians(ui->servoAngleDial->value());
         emit onServoAngle(servoIndex, servoAngle);
     });
 }
